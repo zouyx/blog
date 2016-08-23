@@ -41,9 +41,13 @@ func Publish(article *models.Article) {
 
 func (this *RootArticleRouter) Get() {
 
-	id := this.GetString("id")
-	if id != "" {
-		this.Data["json"], _ = models.GetArticle(&bson.M{"_id": bson.ObjectIdHex(id)})
+	id, _ := this.GetInt64("id")
+	if id > 0 {
+		article := &models.Article{Id_: id}
+		err := models.GetArticle(article, "")
+		if err == nil {
+			this.Data["json"] = article
+		}
 		this.ServeJSON(true)
 	} else {
 		limit := common.Webconfig.PageCount
@@ -92,9 +96,9 @@ func (this *RootArticleRouter) Get() {
 }
 
 func (this *RootArticleRouter) Post() {
-	id := this.GetString("id")
+	id, _ := this.GetInt64("id")
 	if len(this.Input()) == 1 { //删除操作
-		models.DeleteArticle(&bson.M{"_id": bson.ObjectIdHex(id)})
+		models.DeleteArticle(id)
 		this.Data["json"] = true
 		this.ServeJSON(true)
 	} else {
@@ -110,9 +114,10 @@ func (this *RootArticleRouter) Post() {
 		if name == "" {
 			name = strconv.Itoa(int(bson.Now().UnixNano()))
 		}
-		if id != "" {
+		if id > 0 {
+			article := &models.Article{Id_: id}
 			//更新
-			article, _ := models.GetArticle(&bson.M{"_id": bson.ObjectIdHex(id)})
+			models.GetArticle(article, "")
 			article.CName = cat.Name
 			article.NName = nodename
 			article.Name = name

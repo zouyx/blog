@@ -78,11 +78,11 @@ func GetArticleCount() int {
 	return 0
 }
 
-func GetArticle(condition *bson.M) (*Article, error) {
-	// c := DB.C("article")
-	// var article Article
-	// err := c.Find(condition).One(&article)
-	return &Article{}, nil
+func GetArticle(article *Article, column string) error {
+	if column == "" {
+		return o.Read(article)
+	}
+	return o.Read(article, column)
 }
 
 func DeleteArticles(condition *bson.M) (*mgo.ChangeInfo, error) {
@@ -90,9 +90,9 @@ func DeleteArticles(condition *bson.M) (*mgo.ChangeInfo, error) {
 	return &mgo.ChangeInfo{}, nil
 }
 
-func DeleteArticle(condition *bson.M) error {
-	// c := DB.C("article")
-	return nil
+func DeleteArticle(id int64) error {
+	_, err := o.Delete(&Article{Id_: id})
+	return err
 }
 
 func GetTags(condition *bson.M, offset int, limit int, sort string) (*[]TagWrapper, int, error) {

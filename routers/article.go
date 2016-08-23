@@ -1,10 +1,6 @@
 package routers
 
-import (
-	"blog/models"
-
-	"gopkg.in/mgo.v2/bson"
-)
+import "blog/models"
 
 type ArticleRouter struct {
 	baseRouter
@@ -12,7 +8,9 @@ type ArticleRouter struct {
 
 func (this *ArticleRouter) Get() {
 	name := this.Ctx.Input.Param(":article")
-	article, err := models.GetArticle(&bson.M{"name": name})
+
+	article := &models.Article{Name: name}
+	err := models.GetArticle(article,"Name")
 	if !this.CheckError(err) {
 		return
 	}
