@@ -28,7 +28,7 @@
 					  <select id="selectcategory" name="selectcategory" class="input-xlarge focused" data-rel="chosen">
 						{{range $ind,$val:=.Category}}
 					  		{{with $val}}
-							<option value="{{.Id_.Hex}}">{{.Title}}</option>
+							<option value="{{.Id_}}">{{.Title}}</option>
 							{{end}}
 						{{end}}
 					  </select>

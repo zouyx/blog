@@ -7,6 +7,7 @@ import (
 
 	"blog/common"
 	"blog/models"
+
 	"gopkg.in/mgo.v2/bson"
 )
 
@@ -46,8 +47,8 @@ func (this *HomeRouter) Get() {
 
 	this.Data["Data"] = data
 	this.Data["Articles"] = article
-	// this.Data["json"], _ = models.GetAllCategory()
-	// this.ServeJSON(true)
+	this.Data["json"], _ = models.GetAllCategory()
+	this.ServeJSON(true)
 	this.Layout = "layout.html"
 	this.TplName = "articles.html"
 

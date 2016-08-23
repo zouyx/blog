@@ -3,6 +3,7 @@ package models
 //"strings"
 
 import (
+	"github.com/astaxie/beego/orm"
 	mgo "gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 )
@@ -127,8 +128,16 @@ func GetAllCategory() ([]Category, error) {
 	// c := DB.C("category")
 	// var categories []Category
 	// err := c.Find(bson.M{}).Sort("createdtime").All(&categories)
+	qb, _ := orm.NewQueryBuilder(DRIVER)
+
+	qb.Select(" * ").
+		From("category").
+		OrderBy("created_time").Desc()
 	var categories []Category
-	categories = make([]Category, 1, 1)
+	_, err := o.Raw(qb.String()).QueryRows(&categories)
+	if err != nil {
+		return nil, err
+	}
 	return categories, nil
 }
 

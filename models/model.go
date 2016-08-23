@@ -18,17 +18,18 @@ import (
 var (
 	o         orm.Ormer
 	DB_ENGINE = "INNODB"
+	DRIVER    = "mysql"
 )
 
 func init() {
-	orm.RegisterDriver("mysql", orm.DRMySQL)
+	orm.RegisterDriver(DRIVER, orm.DRMySQL)
 
-	orm.RegisterDataBase("default", "mysql", "blog:123456@tcp(10.0.12.19:3306)/blogdb?charset=utf8")
+	orm.RegisterDataBase("default", DRIVER, "blog:123456@tcp(10.0.12.19:3306)/blogdb?charset=utf8")
 	orm.RegisterModel(new(Article),
 		new(Comment),
 		new(Category),
 		new(Node))
-	orm.RunSyncdb("default", false, true)
+	// orm.RunSyncdb("default", false, true)
 
 	o = orm.NewOrm()
 	orm.Debug = true
