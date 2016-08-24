@@ -93,3 +93,16 @@ func TestUpdateState(t *testing.T) {
 		t.Log("update suc!")
 	}
 }
+
+func TestSetTag(t *testing.T) {
+	tag := &TagWrapper{
+		Name:  "joe",
+		Title: "joejoe",
+	}
+	err := tag.SetTag()
+	if err != nil {
+		t.Error(err)
+	} else {
+		t.Log("insert suc!")
+	}
+}

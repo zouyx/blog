@@ -404,7 +404,7 @@ func (this *TagWrapper) TableEngine() string {
 }
 
 func (tag *TagWrapper) SetTag() error {
-	c := DB.C("tags")
+	// c := DB.C("tags")
 	var err error
 	flag := false
 	for _, v := range Tags {
@@ -413,7 +413,7 @@ func (tag *TagWrapper) SetTag() error {
 			removeDuplicate(&v.ArticleIds)
 			v.Count = len(v.ArticleIds)
 			v.ModifiedTime = time.Now()
-			err = c.UpdateId(v.Id_, v)
+			_, err = o.Update(v)
 			flag = true
 			break
 		}
@@ -424,7 +424,7 @@ func (tag *TagWrapper) SetTag() error {
 		tag.CreatedTime = time.Now()
 		tag.ModifiedTime = time.Now()
 		Tags = append(Tags, *tag)
-		err = c.Insert(tag)
+		_, err = o.Insert(tag)
 	}
 
 	SetAppTags()
