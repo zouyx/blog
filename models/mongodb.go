@@ -75,7 +75,11 @@ func GetArticlesByNode(condition *bson.M, offset int, limit int, sort string) (*
 func GetArticleCount() int {
 	// c := DB.C("article")
 	// total, _ := c.Count()
-	return 0
+	cnt, err := o.QueryTable("article").Count()
+	if err != nil {
+		return 0
+	}
+	return int(cnt)
 }
 
 func GetArticle(article *Article, column string) error {
@@ -142,30 +146,30 @@ func GetAllCategory() ([]Category, error) {
 }
 
 func GetCategoryById(id int64) Category {
-	// var category Category
-	// for _, v := range Categories {
-	// 	if v.Id_ == id {
-	// 		category = v
-	// 		break
-	// 	}
-	// }
-	return Category{}
+	var category Category
+	for _, v := range Categories {
+		if v.Id_ == id {
+			category = v
+			break
+		}
+	}
+	return category
 }
 func GetCategoryNodeName(nname string) Category {
-	// var category Category
-	// for _, v := range Categories {
-	// 	flag := false
-	// 	for _, va := range v.Nodes {
-	// 		if va.Name == nname {
-	// 			flag = true
-	// 			break
-	// 		}
-	// 	}
-	// 	if flag {
-	// 		category = v
-	// 	}
-	// }
-	return Category{}
+	var category Category
+	for _, v := range Categories {
+		flag := false
+		for _, va := range v.Nodes {
+			if va.Name == nname {
+				flag = true
+				break
+			}
+		}
+		if flag {
+			category = v
+		}
+	}
+	return category
 }
 
 func DeleteCategory(condition *bson.M) error {

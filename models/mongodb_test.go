@@ -30,3 +30,8 @@ func TestGetArticle(t *testing.T) {
 		t.Log("result:", b)
 	}
 }
+
+func TestGetArticleCount(t *testing.T) {
+	i := GetArticleCount()
+	t.Log("count:", i)
+}
