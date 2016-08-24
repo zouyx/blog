@@ -2,6 +2,7 @@ package models
 
 import (
 	"html/template"
+	"io"
 
 	"blog/common"
 	//"strings"
@@ -19,6 +20,7 @@ var (
 	o         orm.Ormer
 	DB_ENGINE = "INNODB"
 	DRIVER    = "mysql"
+	DEBUG     = true
 )
 
 func init() {
@@ -28,11 +30,18 @@ func init() {
 	orm.RegisterModel(new(Article),
 		new(Comment),
 		new(Category),
+		new(TagWrapper),
+		new(Subscription),
 		new(Node))
-	// orm.RunSyncdb("default", false, true)
+	orm.RunSyncdb("default", false, true)
 
 	o = orm.NewOrm()
-	orm.Debug = true
+
+	if DEBUG {
+		orm.Debug = DEBUG
+		var w io.Writer
+		orm.DebugLog = orm.NewLog(w)
+	}
 }
 
 type Article struct {
@@ -381,13 +390,17 @@ func (category *Category) UpdateCategory() error {
 // }
 
 type TagWrapper struct {
-	Id_          bson.ObjectId `bson:"_id"`
+	Id_          int64 `orm:"column(id);pk;auto"`
 	Name         string
 	Title        string
 	Count        int
 	CreatedTime  time.Time
 	ModifiedTime time.Time
-	ArticleIds   []int64
+	ArticleIds   []int64 `orm:"-"`
+}
+
+func (this *TagWrapper) TableEngine() string {
+	return DB_ENGINE
 }
 
 func (tag *TagWrapper) SetTag() error {
@@ -419,36 +432,39 @@ func (tag *TagWrapper) SetTag() error {
 }
 
 type Subscription struct {
-	Id_    bson.ObjectId `bson:"_id"`
+	Id_    int64 `orm:"column(id);pk;auto"`
 	Email  string
 	Uid    string
 	Status bool
 }
 
-func (subscription *Subscription) Set() error {
-	c := DB.C("subscription")
-	var sub Subscription
-	err := c.Find(bson.M{"email": subscription.Email}).One(&sub)
-	if err != nil {
-		subscription.Id_ = bson.NewObjectId()
-		err = c.Insert(subscription)
-	} else {
-		sub.Email = subscription.Email
-		sub.Status = subscription.Status
-		sub.Uid = subscription.Uid
-		err = c.UpdateId(sub.Id_, sub)
+func (this *Subscription) TableEngine() string {
+	return DB_ENGINE
+}
+
+func (this *Subscription) Set() error {
+	// c := DB.C("subscription")
+	sub := &Subscription{
+		Email:  this.Email,
+		Status: this.Status,
+		Uid:    this.Uid,
+	}
+	created, id, err := o.ReadOrCreate(sub, "Email")
+	if err == nil {
+		if !created {
+			sub.Id_ = id
+			sub.Email = this.Email
+			sub.Status = this.Status
+			sub.Uid = this.Uid
+			_, err = o.Update(sub)
+		}
 	}
 	return err
 }
 
-func (subscription *Subscription) UpdateState() error {
-	c := DB.C("subscription")
-	var sub Subscription
-	err := c.Find(bson.M{"uid": subscription.Uid}).One(&sub)
-	if err != nil {
-		return err
-	}
-	sub.Status = subscription.Status
-	err = c.UpdateId(sub.Id_, sub)
+func (this *Subscription) UpdateState() error {
+	_, err := o.QueryTable("subscription").Filter("Uid", this.Uid).Update(orm.Params{
+		"status": this.Status,
+	})
 	return err
 }

@@ -32,15 +32,19 @@ func TestCreateArticle(t *testing.T) {
 	t.Log(e)
 }
 
-// func TestCreateComment(t *testing.T) {
-// 	c := &Comment{}
-// 	c.Author = "mic"
-// 	c.Name = "mic"
-// 	c.ArticleName = "mic"
-// 	c.CreatedTime = time.Now().Unix()
-// 	err := c.CreateComment()
-// 	t.Error(err)
-// }
+func TestCreateComment(t *testing.T) {
+	c := &Comment{}
+	c.Author = "mic"
+	c.Name = "mic"
+	c.ArticleName = "mic"
+	c.CreatedTime = time.Now().Unix()
+	err := c.CreateComment()
+	if err != nil {
+		t.Error(err)
+	} else {
+		t.Log("insert suc!")
+	}
+}
 
 func TestCreateCategory(t *testing.T) {
 	a := &Category{}
@@ -58,4 +62,34 @@ func TestCreateCategory(t *testing.T) {
 	n.Category = a
 	err = n.CreateNode()
 	t.Log(err)
+}
+
+func TestSubscription(t *testing.T) {
+	sub := &Subscription{
+		Email:  "joejoe",
+		Uid:    "nimei111",
+		Status: true,
+	}
+	err := sub.Set()
+
+	if err != nil {
+		t.Error(err)
+	} else {
+		t.Log("insert suc!")
+	}
+}
+
+func TestUpdateState(t *testing.T) {
+	sub := &Subscription{
+		Email:  "joejoe",
+		Uid:    "nimei111",
+		Status: false,
+	}
+	err := sub.UpdateState()
+
+	if err != nil {
+		t.Error(err)
+	} else {
+		t.Log("update suc!")
+	}
 }

@@ -53,7 +53,17 @@ func GetArticles(condition *bson.M, offset int, limit int, sort string) (*[]Arti
 	// }
 	// err := query.All(&article)
 	// total, _ := c.Find(condition).Count()
-	article = make([]Article, 1, 1)
+	//下面为新增
+	// qb, _ := orm.NewQueryBuilder(DRIVER)
+
+	// qb.Select(" * ").
+	// 	From("article")
+
+	// _, err := o.Raw(qb.String()).QueryRows(&article)
+
+	// if err != nil {
+	// 	return nil, 0, err
+	// }
 	return &article, 0, nil
 }
 

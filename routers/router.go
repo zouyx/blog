@@ -32,10 +32,10 @@ var (
 	TagCount     int
 )
 
-// func init() {
-// 	ArticleCount = models.GetArticleCount()
-// 	TagCount = models.GetTagCount()
-// }
+func init() {
+	ArticleCount = models.GetArticleCount()
+	TagCount = models.GetTagCount()
+}
 
 func MakeData(vars interface{}) T_DATA {
 	//	config := common.Webconfig
