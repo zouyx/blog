@@ -117,3 +117,29 @@ func TestUpdateCategory(t *testing.T) {
 	err := a.UpdateCategory()
 	t.Log(err)
 }
+
+func TestNodeGetArticleCount(t *testing.T) {
+	n := &Node{
+		Name: "joe1",
+	}
+
+	num, err := n.GetArticleCount()
+	if err != nil {
+		t.Error(err)
+	} else {
+		t.Log("get count suc")
+	}
+	t.Log("num:", num)
+
+	n = &Node{
+		Name: "joe",
+	}
+
+	num, err = n.GetArticleCount()
+	if err != nil {
+		t.Error(err)
+	} else {
+		t.Log("get count suc")
+	}
+	t.Log("num:", num)
+}

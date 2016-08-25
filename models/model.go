@@ -319,8 +319,12 @@ func (node *Node) GetAllArticles(offset int, limit int, sort string) (*[]Article
 }
 
 func (node *Node) GetArticleCount() (int, error) {
-	c := DB.C("article")
-	return c.Find(bson.M{"nname": node.Name}).Count()
+	qs := o.QueryTable("article")
+	num, err := qs.Filter("n_name", node.Name).Count()
+	if err != nil {
+		return 0, err
+	}
+	return int(num), nil
 }
 
 // func (node *Node) GetCategory() (*Category, error) {
