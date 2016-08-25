@@ -365,9 +365,8 @@ func (this *Category) CreatCategory() error {
 	return err
 }
 
-func (category *Category) UpdateCategory() error {
-	c := DB.C("category")
-	err := c.UpdateId(category.Id_, category)
+func (this *Category) UpdateCategory() error {
+	_, err := o.Update(this)
 	SetAppCategories()
 	return err
 }

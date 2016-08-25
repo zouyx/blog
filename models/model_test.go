@@ -106,3 +106,14 @@ func TestSetTag(t *testing.T) {
 		t.Log("insert suc!")
 	}
 }
+
+func TestUpdateCategory(t *testing.T) {
+	a := &Category{}
+	a.Id_ = 19
+	a.Name = "joe1"
+	a.Title = "joe2"
+	a.CreatedTime = time.Now()
+	a.UpdatedTime = time.Now()
+	err := a.UpdateCategory()
+	t.Log(err)
+}
