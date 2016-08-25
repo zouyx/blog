@@ -2,7 +2,7 @@ package models
 
 import (
 	"html/template"
-	"io"
+	"os"
 
 	"blog/common"
 	//"strings"
@@ -39,8 +39,9 @@ func init() {
 
 	if DEBUG {
 		orm.Debug = DEBUG
-		var w io.Writer
-		orm.DebugLog = orm.NewLog(w)
+		// var w io.Writer
+
+		orm.DebugLog = orm.NewLog(os.Stderr)
 	}
 }
 
@@ -147,11 +148,14 @@ func (article *Article) GetCommentCount() int {
 }
 
 func (article *Article) GetAroundArticle() (*Article, *Article, error) {
-	c := DB.C("article")
+	// c := DB.C("article")
 	var preresult, nextresult Article
-	err := c.Find(&bson.M{"createdtime": &bson.M{"$lt": article.CreatedTime}}).Sort("-createdtime").Limit(1).One(&preresult)
+	// err := c.Find(&bson.M{"createdtime": &bson.M{"$lt": article.CreatedTime}}).Sort("-createdtime").Limit(1).One(&preresult)
 
-	err = c.Find(&bson.M{"createdtime": &bson.M{"$gt": article.CreatedTime}}).Sort("createdtime").Limit(1).One(&nextresult)
+	// err = c.Find(&bson.M{"createdtime": &bson.M{"$gt": article.CreatedTime}}).Sort("createdtime").Limit(1).One(&nextresult)
+	err := o.Raw("SELECT  * FROM article WHERE created_time<? Order by created_time desc limit 1 ", article.CreatedTime.String()).QueryRow(&preresult)
+	err = o.Raw("SELECT  * FROM article WHERE created_time>? Order by created_time limit 1 ", article.CreatedTime.String()).QueryRow(&nextresult)
+
 	return &preresult, &nextresult, err
 }
 

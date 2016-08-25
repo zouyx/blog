@@ -143,3 +143,26 @@ func TestNodeGetArticleCount(t *testing.T) {
 	}
 	t.Log("num:", num)
 }
+
+func TestGetAroundArticle(t *testing.T) {
+	a := &Article{}
+	var err1 error
+	a.CreatedTime = time.Date(2016, 8, 24, 15, 40, 0, 0, time.UTC)
+
+	// t.Log(a.CreatedTime)
+	if err1 != nil {
+		t.Error(err1)
+	} else {
+		t.Log("get around suc")
+	}
+
+	pre, next, err := a.GetAroundArticle()
+	if err != nil {
+		t.Error(err)
+	} else {
+		t.Log("get around suc")
+	}
+
+	t.Log("pre must 7:", pre)
+	t.Log("next must 9:", next)
+}
