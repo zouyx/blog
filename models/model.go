@@ -1,6 +1,7 @@
 package models
 
 import (
+	"fmt"
 	"html/template"
 	"os"
 
@@ -13,7 +14,6 @@ import (
 
 	"github.com/astaxie/beego/orm"
 	_ "github.com/go-sql-driver/mysql"
-	"gopkg.in/mgo.v2/bson"
 )
 
 var (
@@ -159,21 +159,28 @@ func (article *Article) GetAroundArticle() (*Article, *Article, error) {
 	return &preresult, &nextresult, err
 }
 
-func (article *Article) GetSameTagArticles(limit int) (articles []Article) {
+func (article *Article) GetSameTagArticles(limit int) (articles []*Article) {
 	ids := make([]int64, 0)
-	// for _, v := range Tags {
-	// 	for _, tag := range article.Tags {
-	// 		if tag == v.Title || tag == v.Name {
-	// 			for _, va := range v.ArticleIds {
-	// 				if va != article.Id_ {
-	// 					ids = append(ids, va)
-	// 				}
-	// 			}
-	// 		}
-	// 	}
-	// }
-	d := DB.C("article")
-	d.Find(&bson.M{"_id": &bson.M{"$in": ids}}).Limit(limit).All(&articles)
+	fmt.Println("Tags:", Tags)
+	for _, v := range Tags {
+		for _, tag := range article.Tags {
+			fmt.Println("tag:", tag)
+			if tag == v.Title || tag == v.Name {
+				fmt.Println("true:", v)
+				for _, va := range v.ArticleIds {
+					fmt.Println("va:", va)
+					if va != article.Id_ {
+						ids = append(ids, va)
+					}
+				}
+			}
+		}
+	}
+
+	// d := DB.C("article")
+	// d.Find(&bson.M{"_id": &bson.M{"$in": ids}}).Limit(limit).All(&articles)
+	qs := o.QueryTable("article")
+	qs.Filter("id__in", ids).Limit(limit).All(&articles)
 	return
 }
 
@@ -308,19 +315,19 @@ func (this *Node) TableName() string {
 	return "node"
 }
 
-func (node *Node) GetAllArticles(offset int, limit int, sort string) (*[]Article, int, error) {
-	c := DB.C("article")
+// func (node *Node) GetAllArticles(offset int, limit int, sort string) (*[]Article, int, error) {
+// 	c := DB.C("article")
 
-	var article []Article
-	q := bson.M{"nname": node.Name}
-	query := c.Find(q).Skip(offset).Limit(limit)
-	if sort != "" {
-		query = query.Sort(sort)
-	}
-	err := query.All(&article)
-	total, _ := c.Find(q).Count()
-	return &article, total, err
-}
+// 	var article []Article
+// 	q := bson.M{"nname": node.Name}
+// 	query := c.Find(q).Skip(offset).Limit(limit)
+// 	if sort != "" {
+// 		query = query.Sort(sort)
+// 	}
+// 	err := query.All(&article)
+// 	total, _ := c.Find(q).Count()
+// 	return &article, total, err
+// }
 
 func (node *Node) GetArticleCount() (int, error) {
 	qs := o.QueryTable("article")

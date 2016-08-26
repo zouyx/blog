@@ -35,3 +35,12 @@ func TestGetArticleCount(t *testing.T) {
 	i := GetArticleCount()
 	t.Log("count:", i)
 }
+
+func TestGetAllTags(t *testing.T) {
+	ts, err := GetAllTags()
+	if err != nil {
+		t.Error("error:", err)
+	} else {
+		t.Log("result:", ts)
+	}
+}

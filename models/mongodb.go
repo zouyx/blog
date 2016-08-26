@@ -130,7 +130,7 @@ func GetAllTags() (*[]TagWrapper, error) {
 	// var tags []TagWrapper
 	// err := c.Find(&bson.M{}).All(&tags)
 	var tags []TagWrapper
-	tags = make([]TagWrapper, 1, 1)
+	o.QueryTable("tag_wrapper").All(&tags)
 	return &tags, nil
 }
 

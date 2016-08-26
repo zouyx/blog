@@ -1,6 +1,7 @@
 package models
 
 import (
+	"fmt"
 	"testing"
 	"time"
 )
@@ -165,4 +166,23 @@ func TestGetAroundArticle(t *testing.T) {
 
 	t.Log("pre must 7:", pre)
 	t.Log("next must 9:", next)
+}
+
+func TestGetSameTagArticles(t *testing.T) {
+	a := &Article{}
+	a.Id_ = 1
+	strs := make([]string, 0)
+	strs = append(strs, "joe")
+	a.Tags = strs
+
+	InitDb()
+
+	for _, t := range Tags {
+		t.ArticleIds = append(t.ArticleIds, 20)
+		fmt.Println("set:", t)
+	}
+
+	as := a.GetSameTagArticles(20)
+
+	t.Log("result :", as)
 }
