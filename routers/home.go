@@ -5,10 +5,10 @@ import (
 	"math"
 	"strconv"
 
+	"github.com/astaxie/beego/orm"
+
 	"blog/common"
 	"blog/models"
-
-	"gopkg.in/mgo.v2/bson"
 )
 
 type HomeRouter struct {
@@ -27,7 +27,7 @@ func (this *HomeRouter) Get() {
 
 	vars["Offset"] = page
 
-	article, total, err := models.GetArticles(&bson.M{}, (page-1)*limit, limit, "-createdtime")
+	article, total, err := models.GetArticles(orm.NewCondition(), (page-1)*limit, limit, "-createdtime")
 
 	if !this.CheckError(err) {
 		return

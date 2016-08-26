@@ -5,7 +5,7 @@ import (
 	"blog/models"
 
 	"github.com/astaxie/beego"
-	"gopkg.in/mgo.v2/bson"
+	"github.com/astaxie/beego/orm"
 )
 
 type baseRouter struct {
@@ -117,8 +117,9 @@ func (c *CurrentCategoryInfo) GetCName() string {
 func (this *baseRouter) Prepare() {
 	if this.Ctx.Request.Method == "GET" {
 		this.Data["TagList"] = models.Tags
-		this.Data["HotList"], _, _ = models.GetArticles(&bson.M{}, 0, 10, "-views")
-		this.Data["RecentList"], _, _ = models.GetArticles(&bson.M{}, 0, 10, "-createdtime")
+		cond := orm.NewCondition()
+		this.Data["HotList"], _, _ = models.GetArticles(cond, 0, 10, "-views")
+		this.Data["RecentList"], _, _ = models.GetArticles(cond, 0, 10, "-createdtime")
 		this.Data["CategoryList"] = models.Categories
 		this.Data["SiteConfig"] = common.Webconfig
 	}
