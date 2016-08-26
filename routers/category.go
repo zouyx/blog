@@ -4,10 +4,10 @@ import (
 	"math"
 	"strconv"
 
+	"github.com/astaxie/beego/orm"
+
 	"blog/common"
 	"blog/models"
-
-	"gopkg.in/mgo.v2/bson"
 )
 
 type CategoryRouter struct {
@@ -21,8 +21,9 @@ func (this *CategoryRouter) Get() {
 	if err != nil {
 		page = 1
 	}
-
-	articles, total, err := models.GetArticlesByNode(&bson.M{"cname": categoryname}, (page-1)*limit, limit, "-createdtime")
+	cond := orm.NewCondition()
+	cond.And("cname", categoryname)
+	articles, total, err := models.GetArticlesByNode(cond, (page-1)*limit, limit, "-created_time")
 
 	if !this.CheckError(err) {
 		return

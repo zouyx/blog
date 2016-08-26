@@ -23,7 +23,7 @@ func (this *TagRouter) Get() {
 	if err != nil {
 		page = 1
 	}
-	articles, total, err := models.GetArticlesByTag(tagname, (page-1)*limit, limit, "-createdtime")
+	articles, total, err := models.GetArticlesByTag(tagname, (page-1)*limit, limit, "-created_time")
 
 	if !this.CheckError(err) {
 		return

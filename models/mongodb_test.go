@@ -1,6 +1,10 @@
 package models
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/astaxie/beego/orm"
+)
 
 func TestGetAllCategory(t *testing.T) {
 	c, err := GetAllCategory()
@@ -42,5 +46,25 @@ func TestGetAllTags(t *testing.T) {
 		t.Error("error:", err)
 	} else {
 		t.Log("result:", ts)
+	}
+}
+
+func TestGetArticlesByTag(t *testing.T) {
+	a, _, err := GetArticlesByTag("joe", 1, 1, "created_time")
+	if err != nil {
+		t.Error("error:", err)
+	} else {
+		t.Log("result:", a)
+	}
+}
+
+func TestGetSubscribes(t *testing.T) {
+	cond := orm.NewCondition()
+	cond.And("status", false)
+	a, _, err := GetSubscribes(cond, 0, 1, "")
+	if err != nil {
+		t.Error("error:", err)
+	} else {
+		t.Log("result:", a)
 	}
 }

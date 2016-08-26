@@ -5,7 +5,6 @@ package models
 import (
 	"github.com/astaxie/beego/orm"
 	mgo "gopkg.in/mgo.v2"
-	"gopkg.in/mgo.v2/bson"
 )
 
 var (
@@ -44,27 +43,22 @@ func SetAppTags() {
 	Tags = *tags
 }
 
-func GetArticles(condition *bson.M, offset int, limit int, sort string) (*[]Article, int, error) {
-	// c := DB.C("article")
-	var article []Article
-	// query := c.Find(condition).Skip(offset).Limit(limit)
-	// if sort != "" {
-	// 	query = query.Sort(sort)
-	// }
-	// err := query.All(&article)
-	// total, _ := c.Find(condition).Count()
+func GetArticles(condition *orm.Condition, offset int, limit int, sort string) (*[]Article, int, error) {
+	var articles []Article
 	//下面为新增
-	// qb, _ := orm.NewQueryBuilder(DRIVER)
+	qs := o.QueryTable("article")
+	qs = qs.SetCond(condition).Offset(offset).Limit(limit)
+	if sort != "" {
+		qs = qs.OrderBy(sort)
+	}
 
-	// qb.Select(" * ").
-	// 	From("article")
+	_, err := qs.All(&articles)
 
-	// _, err := o.Raw(qb.String()).QueryRows(&article)
-
-	// if err != nil {
-	// 	return nil, 0, err
-	// }
-	return &article, 0, nil
+	total, _ := qs.SetCond(condition).Count()
+	if err != nil {
+		return nil, 0, err
+	}
+	return &articles, int(total), nil
 }
 
 func GetArticlesByTag(tagname string, offset int, limit int, sort string) (*[]Article, int, error) {
@@ -75,16 +69,16 @@ func GetArticlesByTag(tagname string, offset int, limit int, sort string) (*[]Ar
 			break
 		}
 	}
-	return GetArticles(&bson.M{"_id": bson.M{"$in": tag.ArticleIds}}, offset, limit, sort)
+	cond := orm.NewCondition()
+	cond.And("id__in", tag.ArticleIds)
+	return GetArticles(cond, offset, limit, sort)
 }
 
-func GetArticlesByNode(condition *bson.M, offset int, limit int, sort string) (*[]Article, int, error) {
+func GetArticlesByNode(condition *orm.Condition, offset int, limit int, sort string) (*[]Article, int, error) {
 	return GetArticles(condition, offset, limit, sort)
 }
 
 func GetArticleCount() int {
-	// c := DB.C("article")
-	// total, _ := c.Count()
 	cnt, err := o.QueryTable("article").Count()
 	if err != nil {
 		return 0
@@ -99,36 +93,36 @@ func GetArticle(article *Article, column string) error {
 	return o.Read(article, column)
 }
 
-func DeleteArticles(condition *bson.M) (*mgo.ChangeInfo, error) {
-	// c := DB.C("article")
-	return &mgo.ChangeInfo{}, nil
-}
+// func DeleteArticles(condition *orm.Condition) (*mgo.ChangeInfo, error) {
+// 	// c := DB.C("article")
+// 	qs := o.QueryTable("article")
+// 	num, err := qs.SetCond(condition).Delete()
+// 	return &mgo.ChangeInfo{}, nil
+// }
 
 func DeleteArticle(id int64) error {
 	_, err := o.Delete(&Article{Id_: id})
 	return err
 }
 
-func GetTags(condition *bson.M, offset int, limit int, sort string) (*[]TagWrapper, int, error) {
-	// c := DB.C("tags")
-	// var tags []TagWrapper
-	// query := c.Find(condition).Skip(offset).Limit(limit)
-	// if sort != "" {
-	// 	query = query.Sort(sort)
-	// }
-	// err := query.All(&tags)
-	// total, _ := c.Find(condition).Count()
+// func GetTags(condition *orm.Condition, offset int, limit int, sort string) (*[]TagWrapper, int, error) {
+// 	var tags []TagWrapper
+// 	qs := o.QueryTable("tag_wrapper")
+// 	qs = qs.SetCond(condition).Offset(offset).Limit(limit)
+// 	if sort != "" {
+// 		qs = qs.OrderBy(sort)
+// 	}
 
-	var tags []TagWrapper
-	tags = make([]TagWrapper, 1, 1)
+// 	_, err := qs.All(&tags)
 
-	return &tags, 0, nil
-}
+// 	total, _ := qs.SetCond(condition).Count()
+// 	if err != nil {
+// 		return nil, 0, err
+// 	}
+// 	return &tags, int(total), nil
+// }
 
 func GetAllTags() (*[]TagWrapper, error) {
-	// c := DB.C("tags")
-	// var tags []TagWrapper
-	// err := c.Find(&bson.M{}).All(&tags)
 	var tags []TagWrapper
 	o.QueryTable("tag_wrapper").All(&tags)
 	return &tags, nil
@@ -139,9 +133,6 @@ func GetTagCount() int {
 }
 
 func GetAllCategory() ([]Category, error) {
-	// c := DB.C("category")
-	// var categories []Category
-	// err := c.Find(bson.M{}).Sort("createdtime").All(&categories)
 	qb, _ := orm.NewQueryBuilder(DRIVER)
 
 	qb.Select(" * ").
@@ -182,14 +173,14 @@ func GetCategoryNodeName(nname string) Category {
 	return category
 }
 
-func DeleteCategory(condition *bson.M) error {
-	// c := DB.C("category")
-	// err := c.Remove(condition)
-	// SetAppCategories()
-	return nil
-}
+// func DeleteCategory(condition *bson.M) error {
+// 	// c := DB.C("category")
+// 	// err := c.Remove(condition)
+// 	// SetAppCategories()
+// 	return nil
+// }
 
-func GetSubscribes(condition *bson.M, offset int, limit int, sort string) (*[]Subscription, int, error) {
+func GetSubscribes(condition *orm.Condition, offset int, limit int, sort string) (*[]Subscription, int, error) {
 	// c := DB.C("subscription")
 	// var subs []Subscription
 	// query := c.Find(condition).Skip(offset).Limit(limit)
@@ -199,8 +190,19 @@ func GetSubscribes(condition *bson.M, offset int, limit int, sort string) (*[]Su
 	// err := query.All(&subs)
 	// total, _ := c.Find(condition).Count()
 	var subs []Subscription
-	subs = make([]Subscription, 1, 1)
-	return &subs, 0, nil
+	qs := o.QueryTable("subscription")
+	qs = qs.SetCond(condition).Offset(offset).Limit(limit)
+	if sort != "" {
+		qs = qs.OrderBy(sort)
+	}
+
+	_, err := qs.All(&subs)
+
+	total, _ := qs.SetCond(condition).Count()
+	if err != nil {
+		return nil, 0, err
+	}
+	return &subs, int(total), nil
 }
 
 func removeDuplicate(slis *[]int64) {

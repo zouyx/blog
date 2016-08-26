@@ -3,11 +3,12 @@ package root
 import (
 	"html/template"
 	"strconv"
+	"time"
+
+	"github.com/astaxie/beego/orm"
 
 	"blog/common"
 	"blog/models"
-
-	"gopkg.in/mgo.v2/bson"
 )
 
 type RootArticleRouter struct {
@@ -26,7 +27,9 @@ func Publish(article *models.Article) {
 	var limit int
 	for {
 		offset := limit * 100
-		subs, total, _ := models.GetSubscribes(&bson.M{"status": true}, offset, 100, "")
+		cond := orm.NewCondition()
+		cond.And("status", true)
+		subs, total, _ := models.GetSubscribes(cond, offset, 100, "")
 		for _, v := range *subs {
 			edata.Uid = v.Uid
 			content := common.PaseHtml(common.SubscribeEmailContent, edata)
@@ -56,7 +59,7 @@ func (this *RootArticleRouter) Get() {
 			page = 1
 		}
 
-		article, _, _ := models.GetArticles(&bson.M{}, (page-1)*limit, limit, "-createdtime")
+		article, _, _ := models.GetArticles(orm.NewCondition(), (page-1)*limit, limit, "-createdtime")
 
 		cat := models.Categories
 		this.Data["Category"] = cat
@@ -112,7 +115,7 @@ func (this *RootArticleRouter) Post() {
 		author, _ := this.GetSession("username").(string)
 		cat := models.GetCategoryNodeName(nodename)
 		if name == "" {
-			name = strconv.Itoa(int(bson.Now().UnixNano()))
+			name = strconv.Itoa(int(time.Now().UnixNano()))
 		}
 		if id > 0 {
 			article := &models.Article{Id_: id}
@@ -125,7 +128,7 @@ func (this *RootArticleRouter) Post() {
 			article.Title = title
 			article.Tags = tags
 			article.FeaturedPicURL = featuredPicURL
-			article.ModifiedTime = bson.Now()
+			article.ModifiedTime = time.Now()
 			article.Text = template.HTML(content)
 			article.IsThumbnail = isThumbnail
 
@@ -142,8 +145,8 @@ func (this *RootArticleRouter) Post() {
 				Title:          title,
 				Tags:           tags,
 				FeaturedPicURL: featuredPicURL,
-				CreatedTime:    bson.Now(),
-				ModifiedTime:   bson.Now(),
+				CreatedTime:    time.Now(),
+				ModifiedTime:   time.Now(),
 				Text:           template.HTML(content),
 				IsThumbnail:    isThumbnail,
 			}
