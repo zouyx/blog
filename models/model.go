@@ -129,8 +129,7 @@ func (article *Article) CreatArticle() error {
 }
 
 func (article *Article) UpdateArticle() error {
-	c := DB.C("article")
-	err := c.UpdateId(article.Id_, article)
+	_, err := o.Update(article)
 	go setTags(&article.Tags, article.Id_)
 
 	return err
