@@ -6,8 +6,6 @@ import (
 	"os"
 
 	"blog/common"
-	//"strings"
-	//"log"
 	"regexp"
 	"strings"
 	"time"
@@ -93,10 +91,6 @@ func (article *Article) GetFirstParagraph() *template.HTML {
 }
 
 func (article *Article) GetCategory() *Category {
-	// c := DB.C("category")
-	// var category Category
-	// c.Find(bson.M{"name": article.CName}).One(&category)
-	// return &category
 	var category Category
 	for _, v := range Categories {
 		if v.Name == article.CName {
@@ -129,16 +123,15 @@ func (article *Article) GetTags() *[]TagWrapper {
 }
 
 func (article *Article) CreatArticle() error {
-	// article.Id_ = bson.NewObjectId()
 	_, err := o.Insert(article)
-	// go setTags(&article.Tags, article.Id_)
+	go setTags(&article.Tags, article.Id_)
 	return err
 }
 
 func (article *Article) UpdateArticle() error {
 	c := DB.C("article")
 	err := c.UpdateId(article.Id_, article)
-	// go setTags(&article.Tags, article.Id_)
+	go setTags(&article.Tags, article.Id_)
 
 	return err
 }
@@ -148,11 +141,7 @@ func (article *Article) GetCommentCount() int {
 }
 
 func (article *Article) GetAroundArticle() (*Article, *Article, error) {
-	// c := DB.C("article")
 	var preresult, nextresult Article
-	// err := c.Find(&bson.M{"createdtime": &bson.M{"$lt": article.CreatedTime}}).Sort("-createdtime").Limit(1).One(&preresult)
-
-	// err = c.Find(&bson.M{"createdtime": &bson.M{"$gt": article.CreatedTime}}).Sort("createdtime").Limit(1).One(&nextresult)
 	err := o.Raw("SELECT  * FROM article WHERE created_time<? Order by created_time desc limit 1 ", article.CreatedTime.String()).QueryRow(&preresult)
 	err = o.Raw("SELECT  * FROM article WHERE created_time>? Order by created_time limit 1 ", article.CreatedTime.String()).QueryRow(&nextresult)
 
@@ -177,8 +166,6 @@ func (article *Article) GetSameTagArticles(limit int) (articles []*Article) {
 		}
 	}
 
-	// d := DB.C("article")
-	// d.Find(&bson.M{"_id": &bson.M{"$in": ids}}).Limit(limit).All(&articles)
 	qs := o.QueryTable("article")
 	qs.Filter("id__in", ids).Limit(limit).All(&articles)
 	return
@@ -418,7 +405,6 @@ func (this *TagWrapper) TableEngine() string {
 }
 
 func (tag *TagWrapper) SetTag() error {
-	// c := DB.C("tags")
 	var err error
 	flag := false
 	for _, v := range Tags {
@@ -434,7 +420,6 @@ func (tag *TagWrapper) SetTag() error {
 	}
 
 	if !flag {
-		// tag.Id_ = bson.NewObjectId()
 		tag.CreatedTime = time.Now()
 		tag.ModifiedTime = time.Now()
 		Tags = append(Tags, *tag)
@@ -457,7 +442,6 @@ func (this *Subscription) TableEngine() string {
 }
 
 func (this *Subscription) Set() error {
-	// c := DB.C("subscription")
 	sub := &Subscription{
 		Email:  this.Email,
 		Status: this.Status,

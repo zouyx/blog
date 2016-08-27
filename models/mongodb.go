@@ -2,34 +2,14 @@ package models
 
 //"strings"
 
-import (
-	"github.com/astaxie/beego/orm"
-	mgo "gopkg.in/mgo.v2"
-)
+import "github.com/astaxie/beego/orm"
 
 var (
-	DB         *mgo.Database
 	Categories []Category   //常驻内存
 	Tags       []TagWrapper //常驻内存
 )
 
 func InitDb() {
-
-	// conn := common.Webconfig.Dbconn
-	// if conn == "" {
-	// 	beego.Error("数据库地址还没有配置,请到config内配置db字段.")
-	// 	os.Exit(1)
-	// }
-
-	// session, err := mgo.Dial(conn)
-	// if err != nil {
-	// 	beego.Error("MongoDB连接失败:", err.Error())
-	// 	os.Exit(1)
-	// }
-
-	// session.SetMode(mgo.Monotonic, true)
-
-	// DB = session.DB("messageblog")
 	SetAppCategories()
 	SetAppTags()
 }
@@ -181,14 +161,6 @@ func GetCategoryNodeName(nname string) Category {
 // }
 
 func GetSubscribes(condition *orm.Condition, offset int, limit int, sort string) (*[]Subscription, int, error) {
-	// c := DB.C("subscription")
-	// var subs []Subscription
-	// query := c.Find(condition).Skip(offset).Limit(limit)
-	// if sort != "" {
-	// 	query = query.Sort(sort)
-	// }
-	// err := query.All(&subs)
-	// total, _ := c.Find(condition).Count()
 	var subs []Subscription
 	qs := o.QueryTable("subscription")
 	qs = qs.SetCond(condition).Offset(offset).Limit(limit)
