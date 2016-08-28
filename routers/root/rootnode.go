@@ -8,10 +8,6 @@ import (
 	"blog/models"
 )
 
-import (
-	"gopkg.in/mgo.v2/bson"
-)
-
 type NodeDetail struct {
 	Name          string
 	Title         string
@@ -42,11 +38,11 @@ func (this *RootNodeRouter) Get() {
 						Title:         va.Title,
 						Content:       va.Content,
 						CategoryTitle: v.Title,
-						// CategoryId:    v.Id_.Hex(),
-						CreatedTime: va.CreatedTime,
-						UpdatedTime: va.UpdatedTime,
-						Views:       va.Views,
-						ArticleTime: va.ArticleTime,
+						CategoryId:    strconv.Itoa(int(v.Id_)),
+						CreatedTime:   va.CreatedTime,
+						UpdatedTime:   va.UpdatedTime,
+						Views:         va.Views,
+						ArticleTime:   va.ArticleTime,
 					}
 					flag = true
 					break
@@ -64,17 +60,18 @@ func (this *RootNodeRouter) Get() {
 		nodes := make([]NodeDetail, 0)
 
 		for _, v := range cat {
+			v.GetNodes()
 			for _, va := range v.Nodes {
 				nodes = append(nodes, NodeDetail{
 					Name:          va.Name,
 					Title:         va.Title,
 					Content:       va.Content,
 					CategoryTitle: v.Title,
-					// CategoryId:    v.Id_.Hex(),
-					CreatedTime: va.CreatedTime,
-					UpdatedTime: va.UpdatedTime,
-					Views:       va.Views,
-					ArticleTime: va.ArticleTime,
+					CategoryId:    strconv.Itoa(int(v.Id_)),
+					CreatedTime:   va.CreatedTime,
+					UpdatedTime:   va.UpdatedTime,
+					Views:         va.Views,
+					ArticleTime:   va.ArticleTime,
 				})
 			}
 		}
@@ -109,7 +106,7 @@ func (this *RootNodeRouter) Post() {
 		title := this.GetString("title")
 		content := this.GetString("content")
 		if name == "" {
-			name = strconv.Itoa(int(bson.Now().UnixNano()))
+			name = strconv.Itoa(int(time.Now().UnixNano()))
 		}
 
 		for _, v := range models.Categories {
@@ -119,7 +116,7 @@ func (this *RootNodeRouter) Post() {
 					if va.Name == name { //更新
 						va.Title = title
 						va.Content = content
-						va.UpdatedTime = bson.Now()
+						va.UpdatedTime = time.Now()
 						flag = true
 						break
 					}
@@ -133,6 +130,8 @@ func (this *RootNodeRouter) Post() {
 						CreatedTime: time.Now(),
 						UpdatedTime: time.Now(),
 					}
+					node.Category = &v
+					node.CreateNode()
 					v.Nodes = append(v.Nodes, node)
 				}
 
