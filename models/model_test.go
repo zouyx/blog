@@ -15,10 +15,17 @@ func TestCreateArticle(t *testing.T) {
 	a.CreatedTime = time.Now()
 	a.ModifiedTime = time.Now()
 
-	// comments := make([]*Comment, 0)
+	tags := make([]*TagWrapper, 0)
 
 	// comments = append(comments, c)
 	// a.Comments = comments
+	tag := &TagWrapper{}
+
+	tag.Name = "jj"
+
+	tags = append(tags, tag)
+
+	a.Tags = tags
 
 	err := a.CreatArticle()
 	t.Log(err)
@@ -173,12 +180,12 @@ func TestGetSameTagArticles(t *testing.T) {
 	a.Id_ = 1
 	strs := make([]string, 0)
 	strs = append(strs, "joe")
-	a.Tags = strs
+	// a.Tags = strs
 
 	InitDb()
 
 	for _, t := range Tags {
-		t.ArticleIds = append(t.ArticleIds, 20)
+		// t.ArticleIds = append(t.ArticleIds, 20)
 		fmt.Println("set:", t)
 	}
 

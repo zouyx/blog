@@ -111,8 +111,18 @@ func (this *RootArticleRouter) Post() {
 		content := this.GetString("content")
 		isThumbnail, _ := this.GetBool("isThumbnail")
 		featuredPicURL := this.GetString("featuredPicURL")
-		tags := this.GetStrings("tags")
-		author, _ := this.GetSession("username").(string)
+		tagIds := this.GetStrings("tags")
+		// author, _ := "this.GetSession("username").(string)"
+		author := "joe"
+		var tags []*models.TagWrapper
+		for _, tagId := range tagIds {
+			id, _ := strconv.Atoi(tagId)
+			tag := &models.TagWrapper{
+				Id_: int64(id),
+			}
+			tags = append(tags, tag)
+		}
+
 		cat := models.GetCategoryNodeName(nodename)
 		if name == "" {
 			name = strconv.Itoa(int(time.Now().UnixNano()))

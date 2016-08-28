@@ -2,7 +2,11 @@ package models
 
 //"strings"
 
-import "github.com/astaxie/beego/orm"
+import (
+	"fmt"
+
+	"github.com/astaxie/beego/orm"
+)
 
 var (
 	Categories []Category   //常驻内存
@@ -50,7 +54,7 @@ func GetArticlesByTag(tagname string, offset int, limit int, sort string) (*[]Ar
 		}
 	}
 	cond := orm.NewCondition()
-	cond.And("id__in", tag.ArticleIds)
+	cond.And("id__in", tag.Articles)
 	return GetArticles(cond, offset, limit, sort)
 }
 
@@ -190,14 +194,16 @@ func removeDuplicate(slis *[]int64) {
 	*slis = (*slis)[:j]
 }
 
-func setTags(tags *[]string, aid int64) {
-	for _, v := range *tags {
+func setTags(tags []*TagWrapper, article *Article) {
+	fmt.Println("setTag:")
+	for _, v := range tags {
 		tag := &TagWrapper{
-			Name:       v,
-			Title:      v,
-			Count:      1,
-			ArticleIds: []int64{aid},
+			Name:     v.Name,
+			Title:    v.Title,
+			Count:    1,
+			Articles: []*Article{article},
 		}
-		tag.SetTag()
+		err := tag.SetTag()
+		fmt.Println("setTag err:", err)
 	}
 }

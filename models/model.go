@@ -37,8 +37,6 @@ func init() {
 
 	if DEBUG {
 		orm.Debug = DEBUG
-		// var w io.Writer
-
 		orm.DebugLog = orm.NewLog(os.Stderr)
 	}
 }
@@ -51,7 +49,7 @@ type Article struct {
 	Author         string
 	Title          string
 	Text           template.HTML `orm:"null"`
-	Tags           []string      `orm:"-"`
+	Tags           []*TagWrapper `orm:"reverse(many);null"`
 	FeaturedPicURL string        `orm:"column(featured_pic_url)"`
 	Summary        template.HTML `orm:"null"`
 	Views          int           `orm:"null"`
@@ -70,7 +68,6 @@ func (article *Article) SetSummary() {
 		article.Summary = article.Text
 	} else {
 		strs := strings.Split(string(article.Text), "<!--more-->")
-		//beego.Error(strs[0])
 		n := len(strs)
 		if n > 0 {
 			article.Summary = template.HTML(strs[0])
@@ -81,7 +78,6 @@ func (article *Article) SetSummary() {
 func (article *Article) GetFirstParagraph() *template.HTML {
 	rx := regexp.MustCompile(`<p>(.*)</p>`)
 	p := rx.FindStringSubmatch(string(article.Text))
-	//beego.Error(p)
 	n := len(p)
 	if n > 1 {
 		rep := template.HTML(p[1] + "...")
@@ -124,13 +120,13 @@ func (article *Article) GetTags() *[]TagWrapper {
 
 func (article *Article) CreatArticle() error {
 	_, err := o.Insert(article)
-	go setTags(&article.Tags, article.Id_)
+	go setTags(article.Tags, article)
 	return err
 }
 
 func (article *Article) UpdateArticle() error {
 	_, err := o.Update(article)
-	go setTags(&article.Tags, article.Id_)
+	go setTags(article.Tags, article)
 
 	return err
 }
@@ -153,16 +149,20 @@ func (article *Article) GetSameTagArticles(limit int) (articles []*Article) {
 	for _, v := range Tags {
 		for _, tag := range article.Tags {
 			fmt.Println("tag:", tag)
-			if tag == v.Title || tag == v.Name {
-				fmt.Println("true:", v)
-				for _, va := range v.ArticleIds {
-					fmt.Println("va:", va)
-					if va != article.Id_ {
-						ids = append(ids, va)
-					}
-				}
-			}
+			// if tag == v.Title || tag == v.Name {
+			fmt.Println("true:", v)
+			// for _, va := range v.ArticleIds {
+			// 	fmt.Println("va:", va)
+			// 	if va != article.Id_ {
+			// 		ids = append(ids, va)
+			// 	}
+			// }
+			// }
 		}
+	}
+
+	if len(ids) <= 0 {
+		return
 	}
 
 	qs := o.QueryTable("article")
@@ -173,10 +173,11 @@ func (article *Article) GetSameTagArticles(limit int) (articles []*Article) {
 func (article *Article) GetSelfTags() *[]TagWrapper {
 	var tags []TagWrapper
 	for _, v := range Tags {
-		for _, va := range v.ArticleIds {
-			if va != article.Id_ {
-				tags = append(tags, v)
-			}
+		for _, va := range v.Articles {
+			fmt.Println("true:", va)
+			// if va != article.Id_ {
+			// 	tags = append(tags, v)
+			// }
 		}
 	}
 	return &tags
@@ -396,7 +397,7 @@ type TagWrapper struct {
 	Count        int
 	CreatedTime  time.Time
 	ModifiedTime time.Time
-	ArticleIds   []int64 `orm:"-"`
+	Articles     []*Article `orm:"rel(m2m);null"`
 }
 
 func (this *TagWrapper) TableEngine() string {
@@ -408,9 +409,9 @@ func (tag *TagWrapper) SetTag() error {
 	flag := false
 	for _, v := range Tags {
 		if tag.Name == v.Name {
-			v.ArticleIds = append(v.ArticleIds, tag.ArticleIds...)
-			removeDuplicate(&v.ArticleIds)
-			v.Count = len(v.ArticleIds)
+			v.Articles = append(v.Articles, tag.Articles...)
+			// removeDuplicate(&v.ArticleIds)
+			v.Count = len(v.Articles)
 			v.ModifiedTime = time.Now()
 			_, err = o.Update(v)
 			flag = true
