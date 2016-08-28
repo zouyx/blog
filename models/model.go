@@ -30,6 +30,7 @@ func init() {
 		new(Category),
 		new(TagWrapper),
 		new(Subscription),
+		new(TagWrapperArticle),
 		new(Node))
 	orm.RunSyncdb("default", false, true)
 
@@ -39,6 +40,16 @@ func init() {
 		orm.Debug = DEBUG
 		orm.DebugLog = orm.NewLog(os.Stderr)
 	}
+}
+
+type TagWrapperArticle struct {
+	Id         int64       `orm:"column(id);pk;auto"`
+	Article    *Article    `orm:"rel(fk)"`
+	TagWrapper *TagWrapper `orm:"rel(fk)"`
+}
+
+func (this *TagWrapperArticle) TableEngine() string {
+	return DB_ENGINE
 }
 
 type Article struct {
@@ -101,7 +112,12 @@ func (article *Article) GetNode() *Node {
 	var node *Node
 	for _, v := range Categories {
 		if v.Name == article.CName {
+			//获取关系
+			v.GetNodes()
+			fmt.Println("v:", v)
+
 			for _, va := range v.Nodes {
+				fmt.Println("v.nodes:", va)
 				if va.Name == article.NName {
 					node = va
 					break
@@ -373,6 +389,11 @@ func (this *Category) UpdateCategory() error {
 	return err
 }
 
+func (this *Category) GetNodes() error {
+	_, err := o.LoadRelated(this, "Nodes")
+	return err
+}
+
 // func (category *Category) GetAllNodes() *[]Node {
 // 	c := DB.C("node")
 // 	var nodes []Node
@@ -397,7 +418,7 @@ type TagWrapper struct {
 	Count        int
 	CreatedTime  time.Time
 	ModifiedTime time.Time
-	Articles     []*Article `orm:"rel(m2m);null"`
+	Articles     []*Article `orm:"rel(m2m);null;rel_through(blog/models.TagWrapperArticle)"`
 }
 
 func (this *TagWrapper) TableEngine() string {
@@ -409,21 +430,34 @@ func (tag *TagWrapper) SetTag() error {
 	flag := false
 	for _, v := range Tags {
 		if tag.Name == v.Name {
-			v.Articles = append(v.Articles, tag.Articles...)
-			// removeDuplicate(&v.ArticleIds)
-			v.Count = len(v.Articles)
-			v.ModifiedTime = time.Now()
-			_, err = o.Update(v)
+			// v.Articles = append(v.Articles, tag.Articles...)
+			// removeDuplicate(v.Articles)
+			fmt.Println("update")
+			tag.Id_ = v.Id_
+			tag.Count = len(v.Articles)
+			tag.ModifiedTime = time.Now()
+			_, err = o.Update(tag)
 			flag = true
 			break
 		}
 	}
 
 	if !flag {
+		fmt.Println("Insert")
 		tag.CreatedTime = time.Now()
 		tag.ModifiedTime = time.Now()
 		Tags = append(Tags, *tag)
 		_, err = o.Insert(tag)
+
+		twas := make([]*TagWrapperArticle, 0)
+		for _, article := range tag.Articles {
+			twa := &TagWrapperArticle{
+				TagWrapper: tag,
+				Article:    article,
+			}
+			twas = append(twas, twa)
+		}
+		o.InsertMulti(10, twas)
 	}
 
 	SetAppTags()

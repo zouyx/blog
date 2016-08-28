@@ -23,6 +23,7 @@ func TestGetArticle(t *testing.T) {
 		t.Error("error:", err)
 	} else {
 		t.Log("result:", a)
+		t.Log("result tag:", a.Tags[0])
 	}
 
 	t.Log("query by name")

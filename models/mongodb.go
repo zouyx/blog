@@ -71,10 +71,16 @@ func GetArticleCount() int {
 }
 
 func GetArticle(article *Article, column string) error {
+	var err error
 	if column == "" {
-		return o.Read(article)
+		err = o.Read(article)
+	} else {
+		err = o.Read(article, column)
 	}
-	return o.Read(article, column)
+	if article.Id_ > 0 {
+		_, err = o.LoadRelated(article, "Tags")
+	}
+	return err
 }
 
 // func DeleteArticles(condition *orm.Condition) (*mgo.ChangeInfo, error) {
@@ -181,17 +187,17 @@ func GetSubscribes(condition *orm.Condition, offset int, limit int, sort string)
 	return &subs, int(total), nil
 }
 
-func removeDuplicate(slis *[]int64) {
+func removeDuplicate(slis []*Article) {
 	found := make(map[int64]bool)
 	j := 0
-	for i, val := range *slis {
-		if _, ok := found[val]; !ok {
-			found[val] = true
-			(*slis)[j] = (*slis)[i]
+	for i, val := range slis {
+		if _, ok := found[val.Id_]; !ok {
+			found[val.Id_] = true
+			(slis)[j] = (slis)[i]
 			j++
 		}
 	}
-	*slis = (*slis)[:j]
+	slis = (slis)[:j]
 }
 
 func setTags(tags []*TagWrapper, article *Article) {

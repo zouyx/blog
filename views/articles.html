@@ -14,9 +14,11 @@
                          </time></li>
                      <li class="divider">/</li>
                      {{$innode:=.GetNode}}	
+                     {{if $innode}}
                      <li>
                          <a href="{{$siteURL}}/node/{{$innode.Name}}" title="查看所有文章在 {{$innode.Title}}">{{$innode.Title}}</a>
                      </li>
+                     {{end}}
                      <li class="divider">/</li>
                      <li>浏览:{{.Views}}
                      </li>                   
