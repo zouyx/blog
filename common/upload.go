@@ -18,12 +18,14 @@ func UploadFile(dir string, read io.Reader) (string, error) {
 	SECRET_KEY = Webconfig.UploadConfig.QiniuSecretKey
 
 	extra := &qiniu_io.PutExtra{
-		//	Bucket:         "messagedream",
+		// Bucket:   "messagedream",
 		MimeType: "",
 	}
 
 	var policy = rs.PutPolicy{
-		Scope: "messagedream",
+		Scope: "joe-data-1",
+		//设置Token过期时间
+		Expires: 3600,
 	}
 
 	filename := strings.Replace(UUID(), "-", "", -1) + ".jpg"
