@@ -51,7 +51,7 @@ func TestGetAllTags(t *testing.T) {
 }
 
 func TestGetArticlesByTag(t *testing.T) {
-	a, _, err := GetArticlesByTag("joe", 1, 1, "created_time")
+	a, _, err := GetArticlesByTag("2", 1, 1, "created_time")
 	if err != nil {
 		t.Error("error:", err)
 	} else {

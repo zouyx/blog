@@ -10,6 +10,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/orm"
 	_ "github.com/go-sql-driver/mysql"
 )
@@ -161,19 +162,20 @@ func (article *Article) GetAroundArticle() (*Article, *Article, error) {
 
 func (article *Article) GetSameTagArticles(limit int) (articles []*Article) {
 	ids := make([]int64, 0)
-	fmt.Println("Tags:", Tags)
+	_, err := o.LoadRelated(&article, "Tags")
+	if err != nil {
+		beego.Error("GetSameTagArticles error :", err)
+		return
+	}
 	for _, v := range Tags {
 		for _, tag := range article.Tags {
-			fmt.Println("tag:", tag)
-			// if tag == v.Title || tag == v.Name {
-			fmt.Println("true:", v)
-			// for _, va := range v.ArticleIds {
-			// 	fmt.Println("va:", va)
-			// 	if va != article.Id_ {
-			// 		ids = append(ids, va)
-			// 	}
-			// }
-			// }
+			if tag.Title == v.Title || tag.Name == v.Name {
+				for _, va := range v.Articles {
+					if va.Id_ != article.Id_ {
+						ids = append(ids, va.Id_)
+					}
+				}
+			}
 		}
 	}
 

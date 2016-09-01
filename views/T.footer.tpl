@@ -63,7 +63,7 @@
                 <span>Copyright&nbsp;&nbsp;©&nbsp;&nbsp;2014&nbsp;&nbsp;</span><a href="{{$config.SiteURL}}">{{$config.SiteTitle}}</a> <span>&nbsp;&nbsp;京ICP备14000585号-1&nbsp;|&nbsp;Powered By&nbsp;&nbsp;<a href="http://golang.org/" target="_blank">Golang</a>&nbsp;&nbsp;and&nbsp;&nbsp;<a href="http://www.mongodb.org/" target="_blank">MongoDB</a>&nbsp;&nbsp;静态文件和图片存储由<a href="https://portal.qiniu.com" target="_blank">七牛云存储</a>提供
                     <div style="float: right; margin-right: 30px">
                         <div id="clicki_widget_5773" style="display: inline;">
-                            <a href="http://www.clicki.cn/" target="_blank" style="display: inline; text-decoration: none; border: none; padding: 0; margin: 0;">
+                            <a href="" target="_blank" style="display: inline; text-decoration: none; border: none; padding: 0; margin: 0;">
                                 <img src="{{$config.StaticURL}}/static/{{$config.ThemeName}}/img/16_1.gif" alt="Clicki: We Love Data" title="Clicki: We Love Data" style="display: inline; border: none; padding: 0; margin: 0;"></a>
                         </div>
                         <script>
@@ -82,7 +82,6 @@
                                 var c = document.createElement('script');
                                 c.type = 'text/javascript';
                                 c.async = true;
-                                c.src = ('https:' == document.location.protocol ? 'https://' : 'http://') + 'www.clicki.cn/boot/49009';
                                 var h = document.getElementsByTagName('script')[0];
                                 h.parentNode.insertBefore(c, h);
                             })();

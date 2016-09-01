@@ -2,11 +2,7 @@ package models
 
 //"strings"
 
-import (
-	"fmt"
-
-	"github.com/astaxie/beego/orm"
-)
+import "github.com/astaxie/beego/orm"
 
 var (
 	Categories []Category   //常驻内存
@@ -46,6 +42,10 @@ func GetArticles(condition *orm.Condition, offset int, limit int, sort string) (
 }
 
 func GetArticlesByTag(tagname string, offset int, limit int, sort string) (*[]Article, int, error) {
+	if len(Tags) == 0 {
+		articles := make([]Article, 0)
+		return &articles, 0, nil
+	}
 	var tag TagWrapper
 	for _, v := range Tags {
 		if tagname == v.Name {
@@ -53,8 +53,21 @@ func GetArticlesByTag(tagname string, offset int, limit int, sort string) (*[]Ar
 			break
 		}
 	}
+	_, err := o.LoadRelated(&tag, "Articles")
+	if err != nil {
+		return nil, 0, err
+	}
+
+	if len(tag.Articles) == 0 {
+		articles := make([]Article, 0)
+		return &articles, 0, nil
+	}
+	articleIds := make([]int64, 0, len(tag.Articles))
+	for _, article := range tag.Articles {
+		articleIds = append(articleIds, article.Id_)
+	}
 	cond := orm.NewCondition()
-	cond.And("id__in", tag.Articles)
+	cond.And("id__in", articleIds)
 	return GetArticles(cond, offset, limit, sort)
 }
 
@@ -201,7 +214,6 @@ func removeDuplicate(slis []*Article) {
 }
 
 func setTags(tags []*TagWrapper, article *Article) {
-	fmt.Println("setTag:")
 	for _, v := range tags {
 		tag := &TagWrapper{
 			Name:     v.Name,
@@ -209,7 +221,6 @@ func setTags(tags []*TagWrapper, article *Article) {
 			Count:    1,
 			Articles: []*Article{article},
 		}
-		err := tag.SetTag()
-		fmt.Println("setTag err:", err)
+		tag.SetTag()
 	}
 }

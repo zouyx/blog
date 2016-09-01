@@ -8,10 +8,6 @@ import (
 	"blog/models"
 )
 
-// import (
-// 	"gopkg.in/mgo.v2/bson"
-// )
-
 type TagRouter struct {
 	baseRouter
 }

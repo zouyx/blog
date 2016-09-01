@@ -13,10 +13,12 @@
                              {{$ctime.Year}}年{{$ctime.Month}}月{{$ctime.Day}}日
                          </time></li>
                      <li class="divider">/</li>
-                     {{$innode:=.GetNode}}  
+                     {{$innode:=.GetNode}}	
+                     {{if $innode}}
                      <li>
                          <a href="{{$siteURL}}/node/{{$innode.Name}}" title="查看所有文章在 {{$innode.Title}}">{{$innode.Title}}</a>
-                     </li>                      
+                     </li>             
+                     {{end}}         
                      <li class="divider">/</li>
                      <li>浏览:{{.Views}}
                      </li>
