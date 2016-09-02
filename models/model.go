@@ -1,7 +1,6 @@
 package models
 
 import (
-	"fmt"
 	"html/template"
 	"os"
 
@@ -115,10 +114,8 @@ func (article *Article) GetNode() *Node {
 		if v.Name == article.CName {
 			//获取关系
 			v.GetNodes()
-			fmt.Println("v:", v)
 
 			for _, va := range v.Nodes {
-				fmt.Println("v.nodes:", va)
 				if va.Name == article.NName {
 					node = va
 					break
@@ -162,7 +159,7 @@ func (article *Article) GetAroundArticle() (*Article, *Article, error) {
 
 func (article *Article) GetSameTagArticles(limit int) (articles []*Article) {
 	ids := make([]int64, 0)
-	_, err := o.LoadRelated(&article, "Tags")
+	_, err := o.LoadRelated(article, "Tags")
 	if err != nil {
 		beego.Error("GetSameTagArticles error :", err)
 		return
@@ -191,11 +188,15 @@ func (article *Article) GetSameTagArticles(limit int) (articles []*Article) {
 func (article *Article) GetSelfTags() *[]TagWrapper {
 	var tags []TagWrapper
 	for _, v := range Tags {
+		_, err := o.LoadRelated(&v, "Articles")
+		if err != nil {
+			beego.Error("GetSelfTags error :", err)
+			return &tags
+		}
 		for _, va := range v.Articles {
-			fmt.Println("true:", va)
-			// if va != article.Id_ {
-			// 	tags = append(tags, v)
-			// }
+			if va.Id_ != article.Id_ {
+				tags = append(tags, v)
+			}
 		}
 	}
 	return &tags
@@ -434,7 +435,6 @@ func (tag *TagWrapper) SetTag() error {
 		if tag.Name == v.Name {
 			// v.Articles = append(v.Articles, tag.Articles...)
 			// removeDuplicate(v.Articles)
-			fmt.Println("update")
 			tag.Id_ = v.Id_
 			tag.Count = len(v.Articles)
 			tag.ModifiedTime = time.Now()
@@ -445,7 +445,6 @@ func (tag *TagWrapper) SetTag() error {
 	}
 
 	if !flag {
-		fmt.Println("Insert")
 		tag.CreatedTime = time.Now()
 		tag.ModifiedTime = time.Now()
 		Tags = append(Tags, *tag)
