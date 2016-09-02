@@ -2,7 +2,10 @@ package models
 
 //"strings"
 
-import "github.com/astaxie/beego/orm"
+import (
+	"github.com/astaxie/beego"
+	"github.com/astaxie/beego/orm"
+)
 
 var (
 	Categories []Category   //常驻内存
@@ -200,26 +203,44 @@ func GetSubscribes(condition *orm.Condition, offset int, limit int, sort string)
 	return &subs, int(total), nil
 }
 
-func removeDuplicate(slis []*Article) {
-	found := make(map[int64]bool)
-	j := 0
+func removeDuplicate(slis []*Article) []*Article {
+	newArticles := make([]*Article, 0)
 	for i, val := range slis {
-		if _, ok := found[val.Id_]; !ok {
-			found[val.Id_] = true
-			(slis)[j] = (slis)[i]
-			j++
+		found := false
+		for j, jval := range slis {
+			if val.Id_ == jval.Id_ && i != j {
+				found = true
+				break
+			}
+		}
+
+		if !found {
+			newArticles = append(newArticles, val)
 		}
 	}
-	slis = (slis)[:j]
+
+	return newArticles
 }
 
 func setTags(tags []*TagWrapper, article *Article) {
+	var tag *TagWrapper
 	for _, v := range tags {
-		tag := &TagWrapper{
-			Name:     v.Name,
-			Title:    v.Title,
-			Count:    1,
-			Articles: []*Article{article},
+		if v.Id_ == 0 {
+			tag = &TagWrapper{
+				Name:     v.Name,
+				Title:    v.Title,
+				Count:    1,
+				Articles: []*Article{article},
+			}
+		} else {
+			tag = &TagWrapper{
+				Id_: v.Id_,
+			}
+			err := o.Read(tag)
+			if err != nil {
+				beego.Error("Read tag error:", err)
+			}
+			tag.Articles = []*Article{article}
 		}
 		tag.SetTag()
 	}

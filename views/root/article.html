@@ -97,7 +97,7 @@
 					  <select id="tags" name="tags" data-placeholder="选择标签" class="input-xlarge" multiple data-rel="chosen">
 					  	{{range $in,$va:=.Tags}}
 							{{with $va}}
-						 	 <option value="{{.Title}}">{{.Title}}</option>
+						 	 <option value="{{.Id_}}">{{.Title}}</option>
 							{{end}}
 						 {{end}}
 					  </select>

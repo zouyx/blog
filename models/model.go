@@ -431,12 +431,22 @@ func (this *TagWrapper) TableEngine() string {
 func (tag *TagWrapper) SetTag() error {
 	var err error
 	flag := false
+	articles := make([]*Article, 0)
 	for _, v := range Tags {
-		if tag.Name == v.Name {
-			// v.Articles = append(v.Articles, tag.Articles...)
-			// removeDuplicate(v.Articles)
+		if tag.Id_ == v.Id_ {
+			_, err := o.LoadRelated(&v, "Articles")
+			if err != nil {
+				return err
+			}
+			articles = append(articles, v.Articles...)
+			articles = append(articles, tag.Articles...)
+			articles = removeDuplicate(articles)
+
+			if len(articles) > 0 {
+				tag.Articles = append(tag.Articles, articles...)
+			}
 			tag.Id_ = v.Id_
-			tag.Count = len(v.Articles)
+			tag.Count = len(tag.Articles)
 			tag.ModifiedTime = time.Now()
 			_, err = o.Update(tag)
 			flag = true
@@ -449,9 +459,11 @@ func (tag *TagWrapper) SetTag() error {
 		tag.ModifiedTime = time.Now()
 		Tags = append(Tags, *tag)
 		_, err = o.Insert(tag)
+	}
 
-		twas := make([]*TagWrapperArticle, 0)
-		for _, article := range tag.Articles {
+	twas := make([]*TagWrapperArticle, 0)
+	if len(articles) > 0 {
+		for _, article := range articles {
 			twa := &TagWrapperArticle{
 				TagWrapper: tag,
 				Article:    article,
