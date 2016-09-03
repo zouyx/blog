@@ -2,12 +2,9 @@ package root
 
 import (
 	"strconv"
+	"time"
 
 	"blog/models"
-)
-
-import (
-	"gopkg.in/mgo.v2/bson"
 )
 
 type RootCategoryRouter struct {
@@ -37,7 +34,7 @@ func (this *RootCategoryRouter) Post() {
 	id, err := this.GetInt64("id")
 
 	if len(this.Input()) == 1 { //删除操作
-		// models.DeleteCategory(&bson.M{"_id": bson.ObjectIdHex(id)})
+		// models.DeleteCategory(&time.M{"_id": time.ObjectIdHex(id)})
 		this.Data["json"] = true
 		this.ServeJSON(true)
 	} else {
@@ -45,7 +42,7 @@ func (this *RootCategoryRouter) Post() {
 		title := this.GetString("title")
 		content := this.GetString("content")
 		if name == "" {
-			name = strconv.Itoa(int(bson.Now().UnixNano()))
+			name = strconv.Itoa(int(time.Now().UnixNano()))
 		}
 		if err != nil && id > 0 {
 			for _, v := range models.Categories {
@@ -53,7 +50,7 @@ func (this *RootCategoryRouter) Post() {
 					v.Name = name
 					v.Title = title
 					v.Content = content
-					v.UpdatedTime = bson.Now()
+					v.UpdatedTime = time.Now()
 					v.UpdateCategory()
 					break
 				}
@@ -63,9 +60,9 @@ func (this *RootCategoryRouter) Post() {
 				Name:        name,
 				Title:       title,
 				Content:     content,
-				CreatedTime: bson.Now(),
-				UpdatedTime: bson.Now(),
-				NodeTime:    bson.Now(),
+				CreatedTime: time.Now(),
+				UpdatedTime: time.Now(),
+				NodeTime:    time.Now(),
 			}
 			cat.CreatCategory()
 		}
