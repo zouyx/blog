@@ -5,11 +5,11 @@ import (
 )
 
 type User struct {
-	UserName string
-	Password string
+	UserName    string
+	Password    string
 	EmailServer string
 	EmailSender string
-	EmailPwd string
+	EmailPwd    string
 }
 
 type UploadConf struct {
@@ -27,6 +27,8 @@ type Config struct {
 	// site config
 	SiteTitle    string
 	Dbconn       string
+	Dbuser       string
+	Dbpwd        string
 	StaticURL    string
 	PageCount    int
 	ThemeName    string
@@ -48,13 +50,15 @@ func init() {
 		LogFile:   beego.AppConfig.String("logfile"),
 		SiteTitle: beego.AppConfig.String("appname"),
 		Dbconn:    beego.AppConfig.String("dbconn"),
+		Dbuser:    beego.AppConfig.String("dbuser"),
+		Dbpwd:     beego.AppConfig.String("dbpwd"),
 		ThemeName: beego.AppConfig.String("themename"),
 		ManagerInfo: User{
-			UserName: beego.AppConfig.String("username"),
-			Password: beego.AppConfig.String("password"),
+			UserName:    beego.AppConfig.String("username"),
+			Password:    beego.AppConfig.String("password"),
 			EmailServer: beego.AppConfig.String("emailserver"),
 			EmailSender: beego.AppConfig.String("emailsender"),
-			EmailPwd : beego.AppConfig.String("emailpwd"),
+			EmailPwd:    beego.AppConfig.String("emailpwd"),
 		},
 		UploadConfig: UploadConf{
 			QiniuAccessKey: beego.AppConfig.String("qiniuaccesskey"),

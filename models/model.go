@@ -1,6 +1,7 @@
 package models
 
 import (
+	"fmt"
 	"html/template"
 	"os"
 
@@ -24,7 +25,9 @@ var (
 func init() {
 	orm.RegisterDriver(DRIVER, orm.DRMySQL)
 
-	orm.RegisterDataBase("default", DRIVER, "blog:123456@tcp(10.0.12.19:3306)/blogdb?charset=utf8")
+	dburl := fmt.Sprintf("%s:%s@tcp(%s)/blogdb?charset=utf8", common.Webconfig.Dbuser, common.Webconfig.Dbpwd, common.Webconfig.Dbconn)
+	beego.Info("dburl:", dburl)
+	orm.RegisterDataBase("default", DRIVER, dburl)
 	orm.RegisterModel(new(Article),
 		new(Comment),
 		new(Category),
