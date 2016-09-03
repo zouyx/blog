@@ -1,0 +1,17 @@
+language: go
+sudo: required
+
+go:
+  - 1.6
+
+services:
+    - mysql
+
+env:
+    - GO15VENDOREXPERIMENT="1"
+
+install:
+    - go get github.com/astaxie/beego
+
+script: 
+    - go test -v -tags integration ./...
