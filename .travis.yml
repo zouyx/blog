@@ -11,6 +11,7 @@ env:
     - GO15VENDOREXPERIMENT="1"
 
 before_install:
+    - mkdir $GOPATH/src/blog
     - mv * $GOPATH/src/blog
     - cd $GOPATH/src/blog
 
