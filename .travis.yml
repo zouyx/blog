@@ -17,6 +17,8 @@ before_install:
 
 install:
     - go get github.com/astaxie/beego
+    - go get github.com/qiniu/api.v6
+    - go get github.com/go-sql-driver/mysql
 
 script: 
     - go test -v -tags integration ./...
