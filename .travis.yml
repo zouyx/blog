@@ -11,11 +11,8 @@ env:
     - GO15VENDOREXPERIMENT="1"
 
 before_install:
-    - pwd
-    - cd ..
-    - pwd 
-    - baseDir="$(pwd)"
-    - export GOPATH=$GOPATH:$baseDir
+    - mv * $GOPATH/src/blog
+    - cd $GOPATH/src/blog
 
 install:
     - go get github.com/astaxie/beego
