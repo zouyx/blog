@@ -10,6 +10,13 @@ services:
 env:
     - GO15VENDOREXPERIMENT="1"
 
+before_install:
+    - pwd
+    - cd ..
+    - pwd 
+    - baseDir="$(pwd)"
+    - export GOPATH=$GOPATH:$baseDir
+
 install:
     - go get github.com/astaxie/beego
 
