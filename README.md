@@ -1,3 +1,3 @@
 # blog
-blog
-create
+
+![](https://travis-ci.org/zouyx/blog.svg?branch=master)
