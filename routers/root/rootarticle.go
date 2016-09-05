@@ -112,8 +112,7 @@ func (this *RootArticleRouter) Post() {
 		isThumbnail, _ := this.GetBool("isThumbnail")
 		featuredPicURL := this.GetString("featuredPicURL")
 		tagIds := this.GetStrings("tags")
-		// author, _ := "this.GetSession("username").(string)"
-		author := "joe"
+		author, _ := this.GetSession("username").(string)
 		var tags []*models.TagWrapper
 		for _, tagId := range tagIds {
 			id, _ := strconv.Atoi(tagId)

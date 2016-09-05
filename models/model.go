@@ -379,6 +379,13 @@ type Category struct {
 	Nodes       []*Node   `orm:"reverse(many);null"`
 }
 
+func (this *Category) LoadNodes() {
+	_, err := o.LoadRelated(this, "Nodes")
+	if err != nil {
+		beego.Error("LoadNodes error:", err)
+	}
+}
+
 func (this *Category) TableEngine() string {
 	return DB_ENGINE
 }

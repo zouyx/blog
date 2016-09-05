@@ -6,13 +6,13 @@ import (
 	"blog/models"
 	"blog/routers"
 	"blog/routers/root"
+
 	"github.com/astaxie/beego"
 )
 
 func main() {
 
 	models.InitDb()
-	// beego.SessionOn = true
 	beego.SetLogger("file", `{"filename":"`+common.Webconfig.LogFile+`"}`)
 	beego.SetLevel(beego.LevelInformational)
 	beego.SetLogFuncCall(true)
