@@ -149,6 +149,10 @@ func GetAllCategory() ([]Category, error) {
 	if err != nil {
 		return nil, err
 	}
+	//获取关系表信息
+	for _, category := range categories {
+		category.LoadNodes()
+	}
 	return categories, nil
 }
 
